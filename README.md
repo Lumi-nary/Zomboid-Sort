@@ -1,6 +1,6 @@
 <p align="center">
     <h1 align="center">RimSort</h1>
-    <p align="center">A free and open source multi-platform mod manager for the video game RimWorld.<br>
+    <p align="center">A free and open source multi-platform mod manager for the video game Project Zomboid.<br>
     Built from the ground up to be reliable and community managed.<br>
     Includes support for Linux, Mac, and Windows.</p>
     <p align="center"><strong><a href="https://github.com/RimSort/RimSort/releases">Releases</a> | <a href="https://rimsort.github.io/RimSort/">Wiki</a> | <a href="https://discord.gg/aV7g69JmR2">Discord</a></strong> </p>

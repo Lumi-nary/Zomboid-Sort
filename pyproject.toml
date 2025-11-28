@@ -2,7 +2,7 @@
 
 [project]
 name = "rimsort"
-description = "An open source mod manager for RimWorld."
+description = "An open source mod manager for Project Zomboid."
 version = "0.0.0" # Fake version, version is set in version.xml file # TODO: Switch to tracking version dynamically
 requires-python = "==3.12.*"
 dependencies = [
