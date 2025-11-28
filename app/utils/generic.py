@@ -315,7 +315,7 @@ def handle_remove_read_only(
 
 def get_executable_path(game_install_path: Path) -> str | None:
     """
-    Determine the executable path for RimWorld based on the platform.
+    Determine the executable path for Project Zomboid based on the platform.
 
     :param game_install_path: Path to the game folder.
     :return: Executable path as string or None if not found.
@@ -329,19 +329,19 @@ def get_executable_path(game_install_path: Path) -> str | None:
             (
                 str(exe)
                 for exe in [
-                    p / "RimWorldLinux",
-                    p / "RimWorldWin64.exe",
-                    p / "RimWorldWin.exe",
+                    p / "projectzomboid.sh",
+                    p / "ProjectZomboid64",
+                    p / "ProjectZomboid32",
                 ]
                 if exe.exists()
-                and (exe.name != "RimWorldLinux" or os.access(exe, os.X_OK))
+                and (exe.name != "projectzomboid.sh" or os.access(exe, os.X_OK))
             ),
             None,
         ),
         "Windows": lambda p: next(
             (
                 str(exe)
-                for exe in [p / "RimWorldWin64.exe", p / "RimWorldWin.exe"]
+                for exe in [p / "ProjectZomboid64.exe", p / "ProjectZomboid32.exe"]
                 if exe.exists()
             ),
             None,
@@ -358,10 +358,10 @@ def get_executable_path(game_install_path: Path) -> str | None:
 
 def launch_game_process(game_install_path: Path, args: list[str]) -> None:
     """
-    This function starts the Rimworld game process in it's own Process,
+    This function starts the Project Zomboid game process in it's own Process,
     by launching the executable found in the configured game directory.
 
-    This function initializes the Steamworks API to be used by the RimWorld game.
+    This function initializes the Steamworks API to be used by the Project Zomboid game.
 
     The game will be launched with the game install path being the working directory.
 
@@ -372,12 +372,12 @@ def launch_game_process(game_install_path: Path, args: list[str]) -> None:
         logger.error("The path to the game folder is empty")
         dialogue.show_warning(
             title=translate("launch_game_process", "Game launch failed"),
-            text=translate("launch_game_process", "Unable to launch RimWorld"),
+            text=translate("launch_game_process", "Unable to launch Project Zomboid"),
             information=(
                 translate(
                     "launch_game_process",
-                    "RimSort could not start RimWorld as the game folder is empty or invalid: [{game_install_path}] "
-                    "Please check that the game folder is properly set and that the RimWorld executable exists in it.",
+                    "RimSort could not start Project Zomboid as the game folder is empty or invalid: [{game_install_path}] "
+                    "Please check that the game folder is properly set and that the Project Zomboid executable exists in it.",
                 ).format(game_install_path=game_install_path)
             ),
         )
@@ -391,11 +391,11 @@ def launch_game_process(game_install_path: Path, args: list[str]) -> None:
         logger.error("Game executable validation failed - no valid executable found")
         dialogue.show_warning(
             title=translate("launch_game_process", "Invalid game folder"),
-            text=translate("launch_game_process", "Unable to launch RimWorld"),
+            text=translate("launch_game_process", "Unable to launch Project Zomboid"),
             information=(
                 translate(
                     "launch_game_process",
-                    "RimSort could not validate the RimWorld executable in the specified folder: {game_install_path}. Please check that this directory is correct and contains a valid RimWorld game executable.",
+                    "RimSort could not validate the Project Zomboid executable in the specified folder: {game_install_path}. Please check that this directory is correct and contains a valid Project Zomboid game executable.",
                 ).format(game_install_path=game_install_path)
             ),
         )
@@ -406,13 +406,13 @@ def launch_game_process(game_install_path: Path, args: list[str]) -> None:
     )
     pid, popen_args = launch_process(executable_path, args, str(game_install_path))
     logger.info(
-        f"Launched independent RimWorld game process with PID {pid} using args {popen_args}"
+        f"Launched independent Project Zomboid game process with PID {pid} using args {popen_args}"
     )
 
 
 def validate_game_executable(game_folder: str) -> bool:
     """
-    Validate if the provided game folder contains a valid RimWorld executable.
+    Validate if the provided game folder contains a valid Project Zomboid executable.
 
     :param game_folder: Path to the game folder as a string.
     :return: True if a valid executable is found, False otherwise.
@@ -431,12 +431,12 @@ def validate_game_executable(game_folder: str) -> bool:
     # Use the new get_executable_path function for validation
     executable_path = get_executable_path(game_install_path)
     if executable_path:
-        logger.debug(f"Valid RimWorld executable found: {executable_path}")
+        logger.debug(f"Valid Project Zomboid executable found: {executable_path}")
         return True
 
     system_name = platform.system()
     logger.info(
-        f"No valid RimWorld executable found for {system_name} in: {game_install_path}"
+        f"No valid Project Zomboid executable found for {system_name} in: {game_install_path}"
     )
     return False
 
@@ -683,15 +683,15 @@ def find_steam_rimworld(steam_folder: Path | str) -> str:
     This should be compatible cross-platform.
 
     Given a steam installation path, find and read the libraryfolders.vdf
-    and from this file retrieve the RimWorld steam isntallation path.
+    and from this file retrieve the Project Zomboid steam isntallation path.
 
     :param steam_folder: Path to steam installation
-    :return: Rimworld Path if found, blank str otherwise
+    :return: Project Zomboid Path if found, blank str otherwise
     """
 
     def __load_data(f: TextIOWrapper) -> str:
         """
-        Helper function that returns RimWorld path from libraryfolders.vdf
+        Helper function that returns Project Zomboid path from libraryfolders.vdf
         if found inside, empty string otherwise.
         """
         rimworld_path = ""
@@ -699,9 +699,9 @@ def find_steam_rimworld(steam_folder: Path | str) -> str:
         library_folders = data.get("libraryfolders", None)
         if not library_folders:
             return ""
-        # Find 294100 (RimWorld)
+        # Find 108600 (Project Zomboid)
         for _, folder in library_folders.items():
-            if "294100" in folder.get("apps", {}):
+            if "108600" in folder.get("apps", {}):
                 rimworld_path = folder.get("path", "")
                 break
         return rimworld_path
@@ -713,18 +713,18 @@ def find_steam_rimworld(steam_folder: Path | str) -> str:
     backup_library = "steamapps/libraryfolders.vdf"
 
     if os.path.exists(steam_folder / primary_library):
-        logger.debug(f"Attempting to get RimWorld path from {primary_library}")
+        logger.debug(f"Attempting to get Project Zomboid path from {primary_library}")
         with open(steam_folder / primary_library, "r") as f:
             rimworld_path = __load_data(f)
     elif os.path.exists(steam_folder / backup_library):
-        logger.debug(f"Attempting to get RimWorld path from {backup_library}")
+        logger.debug(f"Attempting to get Project Zomboid path from {backup_library}")
         with open(steam_folder / backup_library, "r") as f:
             rimworld_path = __load_data(f)
     else:
-        logger.warning("Failed retrieving RimWorld path from libraryfolders.vdf")
+        logger.warning("Failed retrieving Project Zomboid path from libraryfolders.vdf")
         return rimworld_path
 
-    full_rimworld_path = Path(rimworld_path) / "steamapps/common/RimWorld"
+    full_rimworld_path = Path(rimworld_path) / "steamapps/common/ProjectZomboid"
 
     return str(full_rimworld_path) if rimworld_path else rimworld_path
 

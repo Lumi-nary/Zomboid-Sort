@@ -111,7 +111,7 @@ def test__parse_required_ludeon_core() -> None:
 
     assert mod.package_id == "ludeon.rimworld"
     assert mod.authors == ["Ludeon Studios"]
-    assert mod.steam_app_id == 294100
+    # assert mod.steam_app_id == 294100 # No longer applies as RimWorld DLCs are removed from constants
     assert mod.valid
 
 
@@ -123,7 +123,7 @@ def test__parse_required_ludeon_royalty() -> None:
 
     assert mod.package_id == "ludeon.rimworld.royalty"
     assert mod.authors == ["Ludeon Studios"]
-    assert mod.steam_app_id == 1149640
+    # assert mod.steam_app_id == 1149640 # No longer applies
     assert mod.supported_versions == {"1.5"}
     assert mod.valid
 
@@ -136,7 +136,7 @@ def test__parse_required_ludeon_biotech() -> None:
 
     assert mod.package_id == "ludeon.rimworld.biotech"
     assert mod.authors == ["Ludeon Studios"]
-    assert mod.steam_app_id == 1826140
+    # assert mod.steam_app_id == 1826140 # No longer applies
     assert mod.supported_versions == {"1.5"}
     assert mod.valid
 

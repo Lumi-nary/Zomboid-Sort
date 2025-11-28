@@ -165,7 +165,7 @@ class MainContent(QObject):
             EventBus().do_refresh_mods_lists.connect(self._do_refresh)
             EventBus().do_clear_active_mods_list.connect(self._do_clear)
             EventBus().do_restore_active_mods_list.connect(self._do_restore)
-            EventBus().do_sort_active_mods_list.connect(self._do_sort)
+            # EventBus().do_sort_active_mods_list.connect(self._do_sort) # Sorting disabled for Project Zomboid
             EventBus().do_save_active_mods_list.connect(self._do_save)
             EventBus().do_run_game.connect(self._do_run_game)
 
@@ -3144,7 +3144,7 @@ class MainContent(QObject):
 
         # If integration is enabled, check for file called "steam_appid.txt" in game folder.
         # in the game folder. If not, create one and add the Steam App ID to it.
-        # The Steam App ID is "294100" for RimWorld.
+        # The Steam App ID is "108600" for Project Zomboid.
         steam_appid_path = (
             # Checks if the platform is darwin(macOS) and moves us up one directory to get out of the app bundle.
             game_install_path.parent / "steam_appid.txt"
@@ -3154,12 +3154,25 @@ class MainContent(QObject):
         )
         if steam_client_integration and not steam_appid_path.exists():
             with open(steam_appid_path, "w", encoding="utf-8") as f:
-                f.write("294100")
+                f.write("108600")
         elif not steam_client_integration and steam_appid_path.exists():
             steam_appid_path.unlink()
 
         # Launch independent game process without Steamworks API
         logger.info("Launching game process without Steamworks API...")
+        # Project Zomboid AppID is 108600.
+        steam_appid_path = (
+            game_install_path.parent / "steam_appid.txt"
+            if sys.platform == "darwin"
+            else game_install_path / "steam_appid.txt"
+        )
+        # Create or overwrite steam_appid.txt with 108600
+        try:
+            with open(steam_appid_path, "w", encoding="utf-8") as f:
+                f.write("108600")
+        except Exception as e:
+            logger.error(f"Failed to create/write steam_appid.txt: {e}")
+
         launch_game_process(game_install_path=game_install_path, args=run_args)
 
     @Slot()

@@ -27,6 +27,7 @@ from app.models.metadata.metadata_structure import (
 )
 from app.utils.constants import RIMWORLD_DLC_METADATA
 from app.utils.xml import json_to_xml_write, xml_path_to_json
+from app.models.metadata.mod_info_parser import parse_mod_info
 
 
 class MalformedDataException(Exception):
@@ -573,6 +574,22 @@ def _create_about_mod_from_xml(
     return valid, mod
 
 
+def _create_mod_from_info(
+    base_path: Path, mod_info_path: Path, target_version: str
+) -> tuple[bool, AboutXmlMod]:
+    mod_data = parse_mod_info(mod_info_path)
+
+    if not mod_data:
+         # logger.error(f"Could not parse {mod_info_path}.") # parse_mod_info logs error
+         return False, AboutXmlMod(valid=False)
+
+    # Use create_about_mod to populate fields, as mapped keys are compatible
+    valid, mod = create_about_mod(mod_data, target_version)
+
+    mod.mod_path = base_path
+    return valid, mod
+
+
 def _create_scenario_mod_from_rsc(
     base_path: Path, mod_rsc_path: Path
 ) -> tuple[bool, ScenarioMod]:
@@ -630,7 +647,17 @@ def create_listed_mod_from_path(
 
     # Check if path is a directory
     if path.is_dir():
-        # Check if About.xml exists
+        # Check if mod.info exists (Project Zomboid)
+        mod_info_path = path / Path("mod.info")
+        if mod_info_path.exists():
+            success, info_mod = _create_mod_from_info(
+                path, mod_info_path, target_version
+            )
+            return success, _set_mod_type(
+                info_mod, local_path, rimworld_path, workshop_path
+            )
+
+        # Check if About.xml exists (RimWorld legacy / fallback)
         about_xml_path = path / Path("About/About.xml")
         if about_xml_path.exists():
             success, about_mod = _create_about_mod_from_xml(
